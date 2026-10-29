@@ -1,0 +1,1494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CASCADE Plus — Head Office Dashboard</title>
+  <style>
+    :root {
+      --green: #047857;
+      --green-dark: #065f46;
+      --green-soft: #ecfdf5;
+      --teal: #0e7490;
+      --teal-soft: #e0f7fa;
+      --ink: #17212f;
+      --muted: #667085;
+      --line: #d9e0e8;
+      --soft: #f8faf9;
+      --app-bg: #f1f5f3;
+      --panel: #ffffff;
+      --amber: #b7791f;
+      --amber-soft: #fff7e8;
+      --red: #c24132;
+      --red-soft: #fff1f0;
+      --shadow: 0 2px 10px rgba(23,33,47,0.06);
+      --shadow-md: 0 6px 20px rgba(23,33,47,0.11);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+    body { min-width: 320px; color: var(--ink); background: var(--app-bg); font-family: "Segoe UI", Arial, sans-serif; line-height: 1.4; }
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      gap: 18px;
+      color: #fff;
+      background: #111827;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      position: sticky; top: 0; z-index: 200;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #10b981, #047857);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 15px; color: white;
+      box-shadow: 0 2px 6px rgba(16,185,129,0.3);
+    }
+
+    .brand-tagline { display: flex; flex-direction: column; gap: 1px; }
+    .brand-title { font-size: 15px; font-weight: 800; color: #d1fae5; letter-spacing: -0.3px; line-height: 1; }
+    .brand-sub { font-size: 10px; color: #9ca3af; font-weight: 500; letter-spacing: 0.02em; }
+
+    /* Global Search */
+    .global-search-wrap {
+      flex: 1;
+      max-width: 520px;
+      position: relative;
+    }
+
+    .global-search-box {
+      width: 100%;
+      height: 36px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 0 38px 0 36px;
+      color: #f3f4f6;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 150ms ease;
+    }
+
+    .global-search-box:focus {
+      background: #111827;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.18);
+    }
+
+    .global-search-box::placeholder { color: #6b7280; font-size: 12px; }
+
+    .search-icon-left {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      width: 15px; height: 15px; color: #6b7280; pointer-events: none;
+    }
+
+    .search-kbd-hint {
+      position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+      font-size: 10px; font-weight: 700; color: #9ca3af; background: #374151;
+      padding: 2px 5px; border-radius: 4px; pointer-events: none; border: 1px solid #4b5563;
+    }
+
+    /* Global Search Dropdown */
+    .search-results-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.22); color: var(--ink);
+      z-index: 1000; overflow: hidden; animation: fadeIn 0.12s ease;
+    }
+
+    .search-section-title {
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); padding: 8px 14px 4px; background: var(--soft);
+    }
+
+    .search-result-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 14px; font-size: 12px; cursor: pointer; border-bottom: 1px solid var(--line);
+      transition: background 120ms;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: var(--green-soft); color: var(--green-dark); }
+    .search-item-main { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .search-item-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #e5e7eb; color: var(--muted); font-weight: 700; }
+
+    .topbar-right {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+
+    /* Last Updated Pill */
+    .last-updated-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 99px;
+      padding: 4px 11px;
+      font-size: 11px; font-weight: 700; color: #6ee7b7;
+      white-space: nowrap;
+    }
+
+    .last-updated-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 2px rgba(16,185,129,0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(16,185,129,0.3); }
+      50%       { box-shadow: 0 0 0 5px rgba(16,185,129,0.1); }
+    }
+
+    .topbar-icon-btn {
+      background: #1f2937; border: 1px solid #374151; border-radius: 7px;
+      width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+      color: #9ca3af; cursor: pointer; transition: all 140ms;
+    }
+    .topbar-icon-btn:hover { color: #d1fae5; border-color: rgba(52,211,153,0.42); background: rgba(16,185,129,0.12); }
+
+    .notif-bell-wrap { position: relative; }
+    .notif-badge {
+      position: absolute; top: -3px; right: -3px;
+      background: #ef4444; color: #fff; font-size: 9px; font-weight: 800;
+      min-width: 15px; height: 15px; border-radius: 99px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 3px; border: 2px solid #111827;
+    }
+
+    .notif-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      width: 350px; max-width: 90vw; background: var(--panel); border: 1px solid var(--line);
+      border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.22); z-index: 1000;
+      display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.15s ease;
+    }
+
+    .notif-header {
+      padding: 10px 14px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; background: var(--soft);
+    }
+    .notif-header h3 { font-size: 12px; font-weight: 700; color: var(--ink); }
+    .notif-mark-read { font-size: 11px; color: var(--teal); background: none; border: none; font-weight: 600; cursor: pointer; }
+
+    .notif-list { max-height: 280px; overflow-y: auto; }
+    .notif-item { padding: 10px 14px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; cursor: pointer; transition: background 120ms; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--soft); }
+    .notif-item.unread { background: #f0fdf4; }
+    .notif-icon { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .notif-icon.alert { background: var(--red-soft); color: var(--red); }
+    .notif-icon.info  { background: var(--teal-soft); color: var(--teal); }
+    .notif-icon.ok    { background: var(--green-soft); color: var(--green); }
+    .notif-title { font-size: 12px; font-weight: 600; color: var(--ink); }
+    .notif-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Profile Dropdown */
+    .profile-wrap { position: relative; }
+    .profile-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: #1f2937; border: 1px solid #374151; border-radius: 7px;
+      padding: 4px 10px 4px 5px; cursor: pointer; color: #d1d5db; font-family: inherit;
+      transition: border-color 150ms;
+    }
+    .profile-btn:hover { border-color: rgba(52,211,153,0.42); }
+    .profile-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg,#10b981,#047857);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: white;
+    }
+    .profile-info { text-align: left; }
+    .profile-name { font-size: 11px; font-weight: 700; color: #f3f4f6; line-height: 1.1; }
+    .profile-role { font-size: 9px; color: #6ee7b7; font-weight: 600; line-height: 1.1; }
+    .profile-arrow { color: #6b7280; font-size: 10px; margin-left: 2px; }
+
+    .profile-dropdown {
+      position: absolute; top: calc(100% + 6px); right: 0; width: 190px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 9px;
+      box-shadow: 0 14px 36px rgba(0,0,0,0.18); z-index: 1000; overflow: hidden; animation: fadeIn 0.15s ease;
+    }
+    .profile-dropdown-header { padding: 10px 12px; background: var(--soft); border-bottom: 1px solid var(--line); }
+    .profile-dropdown-name { font-size: 12px; font-weight: 700; color: var(--ink); }
+    .profile-dropdown-role { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .profile-menu-item {
+      display: flex; align-items: center; gap: 9px; padding: 9px 12px; font-size: 12px;
+      color: var(--ink); cursor: pointer; transition: background 120ms; font-family: inherit;
+      background: none; border: none; width: 100%; text-align: left; font-weight: 500;
+    }
+    .profile-menu-item:hover { background: var(--soft); }
+    .profile-menu-item.danger { color: var(--red); }
+    .profile-menu-item.danger:hover { background: var(--red-soft); }
+    .profile-divider { height: 1px; background: var(--line); }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main {
+      padding: 16px 24px 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      max-width: 1460px; margin: 0 auto;
+    }
+
+    /* Sub-header Bar (Compact) */
+    .dash-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: -4px;
+    }
+    .dash-heading-wrap h1 { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; }
+    .dash-heading-wrap p { font-size: 12px; color: var(--muted); }
+
+    .dash-header-actions {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ===== KPI CARDS (4 Cards) ===== */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+    .kpi-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow);
+      position: relative; overflow: hidden; transition: all 140ms ease;
+    }
+    .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+    .kpi-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--card-accent, var(--green)); border-radius: 12px 12px 0 0;
+    }
+    .kpi-card::after {
+      content: ''; position: absolute; top: -20px; right: -20px; width: 75px; height: 75px;
+      border-radius: 50%; background: var(--card-shape-color, rgba(4,120,87,0.06)); pointer-events: none;
+    }
+
+    .kpi-card.c-teal  { --card-accent: var(--teal);  --card-shape-color: rgba(14,116,144,0.06); }
+    .kpi-card.c-amber { --card-accent: var(--amber); --card-shape-color: rgba(183,121,31,0.06); }
+    .kpi-card.c-green { --card-accent: var(--green); --card-shape-color: rgba(4,120,87,0.06); }
+
+    .kpi-top-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .kpi-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .kpi-icon-wrap {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kpi-icon-wrap.green { background: var(--green-soft); }
+    .kpi-icon-wrap.teal  { background: var(--teal-soft); }
+    .kpi-icon-wrap.amber { background: var(--amber-soft); }
+
+    .kpi-icon-wrap svg { width: 17px; height: 17px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .kpi-icon-wrap.green svg { stroke: var(--green); }
+    .kpi-icon-wrap.teal  svg { stroke: var(--teal); }
+    .kpi-icon-wrap.amber svg { stroke: var(--amber); }
+
+    .kpi-value { font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -0.6px; line-height: 1.1; }
+    .kpi-sub   { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    .kpi-delta {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 700; margin-top: 6px;
+      padding: 2px 7px; border-radius: 99px;
+    }
+    .kpi-delta.up   { background: var(--green-soft); color: var(--green); }
+    .kpi-delta.down { background: var(--red-soft);   color: var(--red); }
+    .kpi-delta.warn { background: var(--amber-soft);  color: var(--amber); }
+
+    /* ===== FINANCIAL OVERVIEW STRIP ===== */
+    .fin-section-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .fin-hdr { display: flex; align-items: center; justify-content: space-between; }
+    .fin-hdr-title { font-size: 13px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+
+    .fin-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    .fin-card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+      padding: 13px 16px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+      transition: all 120ms ease;
+    }
+    .fin-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    .fin-card::after {
+      content: ''; position: absolute; bottom: 0; right: 0; width: 45px; height: 45px;
+      background: var(--fin-shape, rgba(4,120,87,0.05)); clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      pointer-events: none;
+    }
+    .fin-card.fc-ytd  { --fin-shape: rgba(14,116,144,0.07); }
+    .fin-card.fc-lytd { --fin-shape: rgba(183,121,31,0.07); }
+    .fin-card.fc-yoy  { --fin-shape: rgba(4,120,87,0.07); }
+
+    .fin-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .fin-badge-tag { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 6px; border-radius: 4px; }
+    .fin-badge-tag.mtd  { background: var(--green-soft); color: var(--green-dark); }
+    .fin-badge-tag.ytd  { background: var(--teal-soft);  color: var(--teal); }
+    .fin-badge-tag.lytd { background: var(--amber-soft); color: var(--amber); }
+    .fin-badge-tag.yoy  { background: var(--green-soft); color: var(--green); }
+
+    .fin-title { font-size: 10px; color: var(--muted); font-weight: 600; }
+    .fin-value { font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; margin-top: 2px; }
+    .fin-compare { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .fin-badge {
+      display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 99px; margin-top: 4px;
+    }
+    .fin-badge.up   { background: var(--green-soft); color: var(--green); }
+    .fin-badge.down { background: var(--red-soft);   color: var(--red); }
+    .fin-badge.warn { background: var(--amber-soft);  color: var(--amber); }
+
+    /* ===== CHARTS ROW ===== */
+    .charts-row { display: grid; grid-template-columns: 2fr 1.15fr; gap: 14px; }
+
+    .chart-panel {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 16px 20px 14px; box-shadow: var(--shadow);
+    }
+
+    .chart-panel-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 8px;
+    }
+    .chart-title-wrap h3 { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .chart-title-wrap p  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Interactive Pill Switchers */
+    .pill-switcher {
+      display: inline-flex; background: var(--soft); border: 1px solid var(--line);
+      border-radius: 7px; padding: 2px; gap: 2px;
+    }
+    .pill-btn {
+      border: none; background: transparent; padding: 3px 9px; border-radius: 5px;
+      font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer;
+      font-family: inherit; transition: all 120ms;
+    }
+    .pill-btn:hover { color: var(--ink); }
+    .pill-btn.active {
+      background: var(--panel); color: var(--green-dark); font-weight: 700;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .spend-chart-wrap { position: relative; width: 100%; height: 200px; margin-top: 6px; }
+    .spend-chart-wrap svg { width: 100%; height: 100%; overflow: visible; }
+
+    .chart-footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .chart-legend { display: flex; gap: 14px; }
+    .legend-item  { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-weight: 600; }
+    .legend-dot   { width: 8px; height: 8px; border-radius: 50%; }
+    .legend-line  { width: 16px; height: 2px; border-top: 2px dashed #d9e0e8; }
+
+    /* Supplier Bars */
+    .supplier-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .sup-bar-row { cursor: pointer; padding: 2px 0; }
+    .sup-bar-row:hover .sup-bar-fill { filter: brightness(1.1); }
+    .sup-bar-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .sup-bar-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+    .sup-bar-val  { font-size: 11px; font-weight: 700; color: var(--muted); }
+    .sup-bar-track { height: 7px; background: var(--line); border-radius: 99px; overflow: hidden; }
+    .sup-bar-fill  { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
+
+    /* ===== BRANCH TABLE ===== */
+    .branch-panel {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; box-shadow: var(--shadow); overflow: hidden;
+    }
+
+    .branch-panel-hdr {
+      padding: 13px 18px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: #fafbfa;
+    }
+
+    .table-title-area h3 { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .table-title-area p  { font-size: 11px; color: var(--muted); }
+
+    .table-actions { display: flex; align-items: center; gap: 8px; }
+
+    .branch-search-input {
+      height: 31px; border: 1px solid var(--line); border-radius: 6px;
+      padding: 0 10px 0 28px; font-size: 12px; color: var(--ink);
+      background: var(--panel); font-family: inherit; outline: none; width: 210px;
+      transition: border-color 140ms;
+    }
+    .branch-search-input:focus { border-color: var(--green); }
+    .search-input-wrap { position: relative; }
+    .search-input-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 13px; height: 13px; color: var(--muted); pointer-events: none; }
+
+    .btn-ghost-sm {
+      height: 31px; padding: 0 11px; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--panel); font-size: 11px; font-weight: 600; color: var(--muted);
+      cursor: pointer; font-family: inherit; transition: all 120ms;
+    }
+    .btn-ghost-sm:hover { border-color: var(--green); color: var(--green); }
+
+    .branch-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .branch-table th {
+      padding: 9px 16px; text-align: left; font-size: 10.5px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;
+      background: var(--soft); border-bottom: 1px solid var(--line);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    .branch-table th:hover { color: var(--ink); }
+
+    .branch-table td { padding: 10px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .branch-table tbody tr { cursor: pointer; transition: background 120ms; }
+    .branch-table tbody tr:hover { background: #f0fdf4; }
+    .branch-table tbody tr:last-child td { border-bottom: none; }
+
+    /* Interactive Branch Name Cell (No redundant PMR text) */
+    .branch-cell { display: flex; align-items: center; gap: 10px; }
+    .branch-avatar {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: linear-gradient(135deg,#10b981,#047857);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .branch-link-name {
+      font-weight: 700; font-size: 13px; color: #047857; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 4px; transition: color 120ms;
+    }
+    .branch-link-name:hover { color: #065f46; text-decoration: underline; }
+    .branch-link-arrow { font-size: 11px; color: var(--muted); transition: transform 120ms; }
+    tr:hover .branch-link-arrow { transform: translateX(2px); color: var(--green); }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: 99px; font-size: 10.5px; font-weight: 700;
+    }
+    .badge.active   { background: var(--green-soft); color: var(--green); }
+    .badge.inactive { background: var(--red-soft);   color: var(--red); }
+    .badge.low      { background: var(--amber-soft);  color: var(--amber); }
+
+    /* Pagination Bar */
+    .pagination-bar {
+      padding: 10px 18px; border-top: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fafbfa; font-size: 12px; color: var(--muted);
+    }
+    .pagination-controls { display: flex; align-items: center; gap: 5px; }
+    .page-btn {
+      min-width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 5px;
+      background: var(--panel); font-size: 11px; font-weight: 600; color: var(--ink);
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      padding: 0 7px; font-family: inherit; transition: all 120ms;
+    }
+    .page-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .page-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .page-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .page-size-select {
+      height: 28px; border: 1px solid var(--line); border-radius: 5px;
+      padding: 0 6px; font-size: 11px; font-weight: 600; color: var(--ink);
+      background: var(--panel); outline: none; margin-left: 6px;
+    }
+
+    /* ===== DRAWER ===== */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(17,24,39,0.45); z-index: 300;
+      animation: fadeIn 0.15s ease;
+    }
+    .drawer {
+      position: fixed; top: 0; right: 0; width: 550px; max-width: 95vw; height: 100vh;
+      background: var(--panel); box-shadow: -8px 0 40px rgba(23,33,47,0.22);
+      z-index: 400; display: flex; flex-direction: column;
+      animation: slideIn 0.2s ease; overflow: hidden;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+
+    .drawer-hdr {
+      padding: 18px 22px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f8faf9; flex-shrink: 0;
+    }
+    .drawer-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .drawer-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .drawer-close {
+      width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--panel); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; color: var(--muted); transition: all 120ms;
+    }
+    .drawer-close:hover { color: var(--red); border-color: var(--red); }
+
+    .drawer-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+    .drawer-kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .drawer-kpi { background: var(--soft); border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; }
+    .drawer-kpi-label { font-size: 9.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .drawer-kpi-value { font-size: 18px; font-weight: 800; color: var(--ink); }
+    .drawer-kpi-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+    .drawer-section-title { font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+    .d-sup-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .d-sup-row:last-child { border-bottom: none; }
+    .d-sup-name { font-size: 12px; font-weight: 600; }
+    .d-sup-bar-wrap { flex: 1; margin: 0 12px; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
+    .d-sup-bar { height: 100%; background: var(--teal); border-radius: 99px; }
+    .d-sup-val { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 75px; text-align: right; }
+
+    .order-log-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+    .order-log-tbl th { padding: 7px 9px; text-align: left; font-size: 9.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; background: var(--soft); border-bottom: 1px solid var(--line); }
+    .order-log-tbl td { padding: 8px 9px; border-bottom: 1px solid var(--line); }
+    .order-log-tbl tr:last-child td { border-bottom: none; }
+
+    .status-pill { padding: 1px 7px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+    .status-pill.sent     { background: var(--green-soft); color: var(--green); }
+    .status-pill.pending  { background: var(--amber-soft); color: var(--amber); }
+    .status-pill.failed   { background: var(--red-soft);   color: var(--red); }
+    .status-pill.received { background: var(--teal-soft);  color: var(--teal); }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      margin-top: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      font-size: 11.5px; color: var(--muted);
+    }
+    .footer-left { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+    .footer-brand-badge { font-weight: 700; color: var(--green-dark); }
+    .footer-links { display: flex; align-items: center; gap: 14px; }
+    .footer-links a { color: var(--muted); text-decoration: none; transition: color 120ms; }
+    .footer-links a:hover { color: var(--green); text-decoration: underline; }
+
+    /* Toast */
+    .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+    .toast {
+      padding: 10px 16px; background: #1a2535; color: #fff; border-radius: 8px;
+      font-size: 12px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      animation: fadeIn 0.15s ease; display: flex; align-items: center; gap: 8px; cursor: pointer;
+      border-left: 3px solid var(--green);
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .kpi-row { grid-template-columns: repeat(2,1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+      .fin-strip { grid-template-columns: repeat(2,1fr); }
+      .global-search-wrap { max-width: 320px; }
+    }
+    @media (max-width: 720px) {
+      .kpi-row { grid-template-columns: 1fr; }
+      .fin-strip { grid-template-columns: 1fr; }
+      .global-search-wrap { display: none; }
+      .main { padding: 12px; }
+      .topbar { padding: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOPBAR ===== -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo">C+</div>
+    <div class="brand-tagline">
+      <div class="brand-title">CASCADE Plus</div>
+      <div class="brand-sub">Head Office Portal</div>
+    </div>
+  </div>
+
+  <!-- Global Search Implementation -->
+  <div class="global-search-wrap">
+    <svg class="search-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input
+      type="text"
+      class="global-search-box"
+      id="globalSearchInput"
+      placeholder="Search branches, orders, suppliers, or PIP codes..."
+      oninput="handleGlobalSearch(this.value)"
+      onfocus="showSearchResults()"
+    />
+    <span class="search-kbd-hint">Ctrl K</span>
+
+    <!-- Search Results Dropdown -->
+    <div class="search-results-dropdown" id="searchResultsDropdown" hidden>
+      <div class="search-section-title">Branches</div>
+      <div id="searchBranchResults"></div>
+      <div class="search-section-title">Integrated Suppliers</div>
+      <div class="search-result-item" onclick="selectSearchItem('Supplier: AAH Pharmaceuticals')">
+        <div class="search-item-main">
+          <span style="color:var(--green)">&#9679;</span> AAH Pharmaceuticals
+        </div>
+        <span class="search-item-badge">Supplier API Live</span>
+      </div>
+      <div class="search-result-item" onclick="selectSearchItem('Supplier: Alliance Healthcare')">
+        <div class="search-item-main">
+          <span style="color:var(--teal)">&#9679;</span> Alliance Healthcare
+        </div>
+        <span class="search-item-badge">Supplier API Live</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <!-- Live Last Updated Badge -->
+    <div class="last-updated-pill" title="Automatic real-time sync with PMR order pipelines">
+      <div class="last-updated-dot"></div>
+      <span id="lastUpdatedText">Last Synced On: Today, 14:15</span>
+    </div>
+
+    <!-- Refresh Action Button -->
+    <button class="topbar-icon-btn" onclick="handleRefresh()" title="Refresh Dashboard Feed">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+
+    <!-- Notification Bell -->
+    <div class="notif-bell-wrap">
+      <button class="topbar-icon-btn notif-bell-btn" onclick="toggleNotif()" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-badge" id="notifBadge">3</span>
+      </button>
+      <div class="notif-dropdown" id="notifDropdown" hidden>
+        <div class="notif-header">
+          <h3>Notifications</h3>
+          <button class="notif-mark-read" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div class="notif-list">
+          <div class="notif-item unread" onclick="markRead(this)">
+            <div class="notif-icon alert">&#9888;</div>
+            <div>
+              <div class="notif-title">Branch Inactive — Mango Pharmacy 7HF</div>
+              <div class="notif-sub">Zero orders transmitted today &bull; 2h ago</div>
+            </div>
+          </div>
+          <div class="notif-item unread" onclick="markRead(this)">
+            <div class="notif-icon alert">&#9888;</div>
+            <div>
+              <div class="notif-title">Transmission Warning — Hanwell Pharmacy</div>
+              <div class="notif-sub">Order #HW-2841 failed to transmit to AAH &bull; 3h ago</div>
+            </div>
+          </div>
+          <div class="notif-item unread" onclick="markRead(this)">
+            <div class="notif-icon ok">&#10003;</div>
+            <div>
+              <div class="notif-title">Monthly Concession & Spend Report Ready</div>
+              <div class="notif-sub">October group procurement summary finalized &bull; Today</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Dropdown (with Logout) -->
+    <div class="profile-wrap">
+      <button class="profile-btn" onclick="toggleProfile()">
+        <div class="profile-avatar">BP</div>
+        <div class="profile-info">
+          <div class="profile-name">Head Office</div>
+          <div class="profile-role">Group Admin</div>
+        </div>
+        <span class="profile-arrow">&#9660;</span>
+      </button>
+      <div class="profile-dropdown" id="profileDropdown" hidden>
+        <div class="profile-dropdown-header">
+          <div class="profile-dropdown-name">Bhavya Patel</div>
+          <div class="profile-dropdown-role">Group Procurement Superintendent</div>
+        </div>
+        <button class="profile-menu-item" onclick="showToast('Profile management')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Head Office Settings
+        </button>
+        <button class="profile-menu-item" onclick="showToast('Exporting consolidated audit log...')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Audit & Compliance Log
+        </button>
+        <div class="profile-divider"></div>
+        <button class="profile-menu-item danger" onclick="handleLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main">
+
+  <!-- Header Row -->
+  <div class="dash-header-row">
+    <div class="dash-heading-wrap">
+      <h1>Head Office Dashboard</h1>
+    </div>
+    <div class="dash-header-actions">
+      <button class="btn-ghost-sm" onclick="showToast('Exporting executive summary...')">Export PDF</button>
+    </div>
+  </div>
+
+  <!-- Section: Today's Statistics -->
+  <div class="fin-hdr" style="margin-bottom: -4px;">
+    <div class="fin-hdr-title">
+      <span>Today's Statistics</span>
+    </div>
+  </div>
+
+  <!-- KPI CARDS (Today's Key Metrics) -->
+  <div class="kpi-row">
+
+    <!-- KPI 1: Group Savings Today -->
+    <div class="kpi-card c-green">
+      <div class="kpi-top-meta">
+        <span class="kpi-label">Group Savings</span>
+        <div class="kpi-icon-wrap green">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">£1,240</div>
+      <div class="kpi-sub">Captured across 11 active branches</div>
+      <div class="kpi-delta up">&#9650; +11.4% vs yesterday</div>
+    </div>
+
+    <!-- KPI 2: Orders Today -->
+    <div class="kpi-card c-teal">
+      <div class="kpi-top-meta">
+        <span class="kpi-label">Orders Placed</span>
+        <div class="kpi-icon-wrap teal">
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">284</div>
+      <div class="kpi-sub">18 Processing &bull; 4 Flagged / Incomplete</div>
+      <div class="kpi-delta warn">&#9650; 4 need branch action</div>
+    </div>
+
+    <!-- KPI 3: Active Branches -->
+    <div class="kpi-card c-amber">
+      <div class="kpi-top-meta">
+        <span class="kpi-label">Active Branches</span>
+        <div class="kpi-icon-wrap amber">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">11 <span style="font-size:15px;font-weight:600;color:var(--muted)">/ 13 Active</span></div>
+      <div class="kpi-sub">2 branches have zero order activity today</div>
+      <div class="kpi-delta warn">&#9888; 2 branches inactive</div>
+    </div>
+
+    <!-- KPI 4: Supplier Order Success Rate -->
+    <div class="kpi-card c-teal">
+      <div class="kpi-top-meta">
+        <span class="kpi-label">Supplier Order Success Rate</span>
+        <div class="kpi-icon-wrap teal">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+      </div>
+      <div class="kpi-value">97.2%</div>
+      <div class="kpi-sub">Direct order transmissions across 8 suppliers</div>
+      <div class="kpi-delta up">&#9650; +0.5% vs yesterday</div>
+    </div>
+
+  </div>
+
+  <!-- FINANCIAL OVERVIEW STRIP -->
+  <div class="fin-section-wrap">
+    <div class="fin-hdr">
+      <div class="fin-hdr-title">
+        <span>Financial Overview</span>
+      </div>
+    </div>
+    <div class="fin-strip">
+
+      <!-- MTD Card with "Across 13 branches" -->
+      <div class="fin-card">
+        <div class="fin-card-top">
+          <span class="fin-badge-tag mtd">MTD</span>
+          <span class="fin-title">October 2026</span>
+        </div>
+        <div class="fin-value">£84,620</div>
+        <div class="fin-compare">From 13 branches &bull; 94% budget used</div>
+        <div class="fin-badge up">&#9650; +6.2% vs Sep 2026 (£79,680)</div>
+      </div>
+
+      <div class="fin-card fc-ytd">
+        <div class="fin-card-top">
+          <span class="fin-badge-tag ytd">YTD</span>
+          <span class="fin-title">Jan – Oct 2026</span>
+        </div>
+        <div class="fin-value">£842,400</div>
+        <div class="fin-compare">Annual target £1.04M &bull; 81% utilised</div>
+        <div class="fin-badge up">&#9650; +8.4% pace vs forecast</div>
+      </div>
+
+      <div class="fin-card fc-lytd">
+        <div class="fin-card-top">
+          <span class="fin-badge-tag lytd">LYTD</span>
+          <span class="fin-title">Jan – Oct 2025</span>
+        </div>
+        <div class="fin-value">£777,300</div>
+        <div class="fin-compare">Full Year 2025 actual: £921,000</div>
+        <div class="fin-badge warn">&#8212; Baseline prior year</div>
+      </div>
+
+      <div class="fin-card fc-yoy">
+        <div class="fin-card-top">
+          <span class="fin-badge-tag yoy">YoY Line Item Growth</span>
+          <span class="fin-title">2026 vs 2025</span>
+        </div>
+        <div class="fin-value">+8.4%</div>
+        <div class="fin-compare">+12,450 line items ordered vs 2025</div>
+        <div class="fin-badge up">&#9650; Dispensing volume increase</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHARTS ROW WITH IN-CARD LOCAL FILTERS -->
+  <div class="charts-row">
+
+    <!-- Spend Trend Chart (With Daily / Weekly / Monthly Switcher) -->
+    <div class="chart-panel">
+      <div class="chart-panel-hdr">
+        <div class="chart-title-wrap">
+          <h3 id="trendChartTitle">Group Spend Trend — Daily (October 2026)</h3>
+          <p id="trendChartSub">Comparing daily purchasing volume against prior month</p>
+        </div>
+        <!-- In-Chart Filter Switcher -->
+        <div class="pill-switcher">
+          <button class="pill-btn active" id="btnDaily" onclick="switchSpendFilter('daily')">Daily (MTD)</button>
+          <button class="pill-btn" id="btnWeekly" onclick="switchSpendFilter('weekly')">Weekly</button>
+          <button class="pill-btn" id="btnMonthly" onclick="switchSpendFilter('monthly')">Monthly (YTD)</button>
+        </div>
+      </div>
+
+      <div class="spend-chart-wrap">
+        <svg viewBox="0 0 700 190" preserveAspectRatio="none" id="spendTrendSvg">
+          <!-- Rendered dynamically by switchSpendFilter() -->
+        </svg>
+      </div>
+
+      <div class="chart-footer-row">
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#047857"></div><span id="legendCurr">Current Period</span></div>
+          <div class="legend-item"><div class="legend-line"></div><span id="legendPrev">Previous Baseline</span></div>
+        </div>
+        <span style="font-size:11px;color:var(--muted)">Hover or click points to audit</span>
+      </div>
+    </div>
+
+    <!-- Supplier Spend Split (With MTD vs YTD Switcher) -->
+    <div class="chart-panel">
+      <div class="chart-panel-hdr">
+        <div class="chart-title-wrap">
+          <h3 id="supplierCardTitle">Supplier Spend Split (MTD)</h3>
+          <p id="supplierCardSub">Share of group procurement by supplier</p>
+        </div>
+        <!-- In-Chart Filter Switcher -->
+        <div class="pill-switcher">
+          <button class="pill-btn active" id="btnSupMTD" onclick="switchSupplierPeriod('mtd')">MTD</button>
+          <button class="pill-btn" id="btnSupYTD" onclick="switchSupplierPeriod('ytd')">YTD</button>
+        </div>
+      </div>
+
+      <div class="supplier-bars" id="supplierBarsContainer">
+        <!-- Injected dynamically by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BRANCH PERFORMANCE TABLE (No View column, No duplicate PMR, With Pagination) -->
+  <div class="branch-panel">
+    <div class="branch-panel-hdr">
+      <div class="table-title-area">
+        <h3>Branch Performance</h3>
+      </div>
+      <div class="table-actions">
+        <div class="search-input-wrap">
+          <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="branch-search-input" type="text" placeholder="Filter branches..." oninput="filterBranchTable(this.value)"/>
+        </div>
+        <button class="btn-ghost-sm" onclick="showToast('Exporting branch performance CSV...')">Export CSV</button>
+      </div>
+    </div>
+
+    <table class="branch-table" id="branchTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable('name')">Branch Name &#8597;</th>
+          <th onclick="sortTable('pmr')">PMR System &#8597;</th>
+          <th onclick="sortTable('orders')">Orders Today &#8597;</th>
+          <th onclick="sortTable('spend')">MTD Spend &#8597;</th>
+          <th onclick="sortTable('topSupplier')">Top Supplier</th>
+          <th onclick="sortTable('txRate')">Order Success Rate &#8597;</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="branchTbody">
+        <!-- Rendered by renderTable() with pagination -->
+      </tbody>
+    </table>
+
+    <!-- Pagination Bar -->
+    <div class="pagination-bar">
+      <div>
+        <span id="pageInfoText">Showing 1 to 5 of 13 branches</span>
+        <label style="margin-left:8px;font-size:11px;">
+          Rows:
+          <select class="page-size-select" id="pageSizeSelect" onchange="changePageSize(this.value)">
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="15">All (13)</option>
+          </select>
+        </label>
+      </div>
+      <div class="pagination-controls" id="paginationButtons">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== BRANCH DRILL-DOWN DRAWER ===== -->
+<div id="drawerOverlay" class="drawer-overlay" hidden onclick="closeDrawer()"></div>
+<div id="drawer" class="drawer" hidden>
+  <div class="drawer-hdr">
+    <div>
+      <div class="drawer-title" id="drawerBranchName">Branch Detail</div>
+      <div class="drawer-sub" id="drawerBranchSub">Loading...</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-kpi-row" id="drawerKpiRow"></div>
+    <div>
+      <div class="drawer-section-title">Supplier Spend Allocation (MTD)</div>
+      <div id="drawerSuppliers"></div>
+    </div>
+    <div>
+      <div class="drawer-section-title">Recent Order Transmissions Log</div>
+      <table class="order-log-tbl">
+        <thead>
+          <tr><th>Order ID</th><th>Supplier</th><th>Items</th><th>Value</th><th>Status</th><th>Time</th></tr>
+        </thead>
+        <tbody id="drawerOrderLog"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SITE FOOTER ===== -->
+<footer class="site-footer">
+  <div class="footer-left">
+    <span class="footer-brand-badge">CASCADE Plus™</span>
+    <span>&bull;</span>
+    <span>&copy; 2026 Luxsh Tech Ltd. All rights reserved.</span>
+    <span>&bull;</span>
+    <span style="color:var(--muted)">UK Pharmacy Procurement Platform</span>
+  </div>
+  <div class="footer-links">
+    <a href="javascript:void(0)" onclick="showToast('Regulatory Compliance: NHS Digital & MHRA GDP Standards followed.')">Compliance & GDP</a>
+    <a href="javascript:void(0)" onclick="showToast('Displaying Luxsh Tech Standard Terms & Conditions (2026)')">Terms of Service</a>
+    <a href="javascript:void(0)" onclick="showToast('Displaying Privacy Policy')">Privacy Policy</a>
+    <a href="javascript:void(0)" onclick="showToast('Support: support@luxshtech.com')">Help & Support</a>
+  </div>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ===== LOGIC & SCRIPTS ===== -->
+<script>
+  /* ====== 13 Real Pharmacy Branches ====== */
+  const branches = [
+    { id:'b1',  initials:'CP', name:'Camden Pharmacy', pmr:'ProScript Connect', orders:52, spend:14200, topSupplier:'AAH', txRate:98.1, status:'active', trend:'up',
+      suppliers:[{n:'AAH',v:6800,p:48},{n:'Alliance',v:4200,p:30},{n:'Phoenix',v:2100,p:15},{n:'BNS',v:1100,p:7}],
+      orders_log:[{id:'CP-2841',sup:'AAH',items:24,val:'£1,240',st:'sent',t:'09:14'},{id:'CP-2840',sup:'Alliance',items:12,val:'£820',st:'sent',t:'08:52'},{id:'CP-2839',sup:'Phoenix',items:8,val:'£430',st:'received',t:'08:30'},{id:'CP-2838',sup:'AAH',items:31,val:'£1,680',st:'sent',t:'Yesterday'},{id:'CP-2837',sup:'BNS',items:6,val:'£210',st:'sent',t:'Yesterday'}]
+    },
+    { id:'b2',  initials:'MA', name:'Martin Account', pmr:'RX Web', orders:38, spend:10800, topSupplier:'Alliance', txRate:97.4, status:'active', trend:'up',
+      suppliers:[{n:'Alliance',v:5200,p:48},{n:'AAH',v:3100,p:29},{n:'Sigma',v:1500,p:13},{n:'Others',v:1000,p:9}],
+      orders_log:[{id:'MA-1921',sup:'Alliance',items:18,val:'£980',st:'sent',t:'09:22'},{id:'MA-1920',sup:'AAH',items:14,val:'£740',st:'pending',t:'08:40'},{id:'MA-1919',sup:'Sigma',items:5,val:'£190',st:'sent',t:'08:10'},{id:'MA-1918',sup:'Alliance',items:22,val:'£1,120',st:'sent',t:'Yesterday'}]
+    },
+    { id:'b3',  initials:'NP', name:'Newport Pharmacy', pmr:'ProScript Connect', orders:44, spend:12100, topSupplier:'AAH', txRate:99.1, status:'active', trend:'flat',
+      suppliers:[{n:'AAH',v:5800,p:48},{n:'Phoenix',v:3500,p:29},{n:'Alliance',v:1800,p:15},{n:'BNS',v:1000,p:8}],
+      orders_log:[{id:'NP-3341',sup:'AAH',items:28,val:'£1,540',st:'sent',t:'09:05'},{id:'NP-3340',sup:'Phoenix',items:16,val:'£880',st:'sent',t:'08:44'},{id:'NP-3339',sup:'Alliance',items:7,val:'£320',st:'sent',t:'08:20'},{id:'NP-3338',sup:'AAH',items:19,val:'£1,040',st:'received',t:'Yesterday'}]
+    },
+    { id:'b4',  initials:'MB', name:'Medicine Box Pharmacy', pmr:'Apotec', orders:29, spend:8400, topSupplier:'Phoenix', txRate:94.8, status:'low', trend:'down',
+      suppliers:[{n:'Phoenix',v:4200,p:50},{n:'AAH',v:2500,p:30},{n:'BNS',v:1200,p:14},{n:'Others',v:500,p:6}],
+      orders_log:[{id:'MB-1121',sup:'Phoenix',items:15,val:'£820',st:'sent',t:'09:30'},{id:'MB-1120',sup:'AAH',items:9,val:'£490',st:'failed',t:'08:15'},{id:'MB-1119',sup:'BNS',items:4,val:'£140',st:'sent',t:'08:00'}]
+    },
+    { id:'b5',  initials:'RP', name:'Riverside Pharmacy', pmr:'ProScript Connect', orders:61, spend:16800, topSupplier:'AAH', txRate:98.4, status:'active', trend:'up',
+      suppliers:[{n:'AAH',v:8200,p:49},{n:'Alliance',v:4800,p:29},{n:'Phoenix',v:2500,p:15},{n:'Sigma',v:1300,p:7}],
+      orders_log:[{id:'RP-4441',sup:'AAH',items:34,val:'£1,860',st:'sent',t:'09:18'},{id:'RP-4440',sup:'Alliance',items:21,val:'£1,140',st:'sent',t:'09:00'},{id:'RP-4439',sup:'Phoenix',items:11,val:'£600',st:'received',t:'08:35'}]
+    },
+    { id:'b6',  initials:'WP', name:'Whitefield Pharmacy', pmr:'RX Web', orders:33, spend:9200, topSupplier:'Alliance', txRate:96.2, status:'active', trend:'flat',
+      suppliers:[{n:'Alliance',v:4400,p:48},{n:'AAH',v:2800,p:30},{n:'BNS',v:1200,p:13},{n:'Others',v:800,p:9}],
+      orders_log:[{id:'WP-2221',sup:'Alliance',items:16,val:'£880',st:'sent',t:'09:10'},{id:'WP-2220',sup:'AAH',items:12,val:'£640',st:'sent',t:'08:48'},{id:'WP-2219',sup:'BNS',items:5,val:'£200',st:'sent',t:'08:22'}]
+    },
+    { id:'b7',  initials:'PH', name:'Pyramid Pharmacy Helier', pmr:'ProScript Connect', orders:0, spend:0, topSupplier:'—', txRate:0, status:'inactive', trend:'down',
+      suppliers:[], orders_log:[]
+    },
+    { id:'b8',  initials:'PN', name:'Pyramid Pharmacy Northend', pmr:'Apotec', orders:27, spend:7620, topSupplier:'AAH', txRate:91.3, status:'low', trend:'down',
+      suppliers:[{n:'AAH',v:3800,p:50},{n:'Alliance',v:2200,p:29},{n:'Phoenix',v:1000,p:13},{n:'Others',v:620,p:8}],
+      orders_log:[{id:'PN-1001',sup:'AAH',items:14,val:'£760',st:'failed',t:'09:05'},{id:'PN-1000',sup:'Alliance',items:10,val:'£520',st:'pending',t:'08:40'}]
+    },
+    { id:'b9',  initials:'BC', name:'Brownes Chemist', pmr:'RX Web', orders:41, spend:11300, topSupplier:'Phoenix', txRate:97.6, status:'active', trend:'up',
+      suppliers:[{n:'Phoenix',v:5400,p:48},{n:'AAH',v:3300,p:29},{n:'Alliance',v:1600,p:14},{n:'Sigma',v:1000,p:9}],
+      orders_log:[{id:'BC-3001',sup:'Phoenix',items:22,val:'£1,200',st:'sent',t:'09:28'},{id:'BC-3000',sup:'AAH',items:14,val:'£760',st:'sent',t:'09:00'}]
+    },
+    { id:'b10', initials:'M7', name:'Mango Pharmacy 7HF', pmr:'ProScript Connect', orders:0, spend:0, topSupplier:'—', txRate:0, status:'inactive', trend:'down',
+      suppliers:[], orders_log:[]
+    },
+    { id:'b11', initials:'WF', name:'Warman Freed Pharmacy', pmr:'RX Web', orders:36, spend:10200, topSupplier:'AAH', txRate:98.8, status:'active', trend:'flat',
+      suppliers:[{n:'AAH',v:5000,p:49},{n:'Alliance',v:2900,p:28},{n:'Phoenix',v:1500,p:15},{n:'BNS',v:800,p:8}],
+      orders_log:[{id:'WF-5551',sup:'AAH',items:19,val:'£1,020',st:'sent',t:'09:16'},{id:'WF-5550',sup:'Alliance',items:11,val:'£590',st:'sent',t:'08:54'}]
+    },
+    { id:'b12', initials:'HP', name:'Hanwell Pharmacy', pmr:'Apotec', orders:25, spend:6800, topSupplier:'Alliance', txRate:92.5, status:'low', trend:'down',
+      suppliers:[{n:'Alliance',v:3200,p:47},{n:'AAH',v:2100,p:31},{n:'BNS',v:900,p:13},{n:'Others',v:600,p:9}],
+      orders_log:[{id:'HP-8801',sup:'Alliance',items:12,val:'£640',st:'sent',t:'09:08'},{id:'HP-8800',sup:'AAH',items:8,val:'£420',st:'failed',t:'08:35'}]
+    },
+    { id:'b13', initials:'GG', name:'Greencross Pharmacy (Garston)', pmr:'ProScript Connect', orders:48, spend:13200, topSupplier:'AAH', txRate:97.9, status:'active', trend:'up',
+      suppliers:[{n:'AAH',v:6400,p:49},{n:'Alliance',v:3800,p:29},{n:'Phoenix',v:2000,p:15},{n:'BNS',v:1000,p:7}],
+      orders_log:[{id:'GG-7701',sup:'AAH',items:26,val:'£1,400',st:'sent',t:'09:20'},{id:'GG-7700',sup:'Alliance',items:15,val:'£800',st:'sent',t:'09:02'}]
+    }
+  ];
+
+  /* ====== State Management ====== */
+  let currentFilteredList = [...branches];
+  let currentPage = 1;
+  let pageSize = 5;
+  let sortField = 'spend';
+  let sortDirection = -1;
+
+  /* ====== Table Rendering with Pagination ====== */
+  function renderTable() {
+    const tbody = document.getElementById('branchTbody');
+    const total = currentFilteredList.length;
+
+    // Calculate pagination slice
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, total);
+    const pageItems = currentFilteredList.slice(startIndex, endIndex);
+
+    if (pageItems.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No matching branches found</td></tr>`;
+    } else {
+      tbody.innerHTML = pageItems.map(b => {
+        const statusBadge = b.status === 'active'
+          ? `<span class="badge active">&#9679; Active</span>`
+          : b.status === 'inactive'
+          ? `<span class="badge inactive">&#9679; Inactive</span>`
+          : `<span class="badge low">&#9679; Low Activity</span>`;
+
+        const txColor = b.txRate >= 97 ? 'var(--green)' : b.txRate >= 93 ? 'var(--amber)' : 'var(--red)';
+        const spendStr = b.spend > 0 ? `£${b.spend.toLocaleString()}` : '<span style="color:var(--muted)">—</span>';
+        const txStr = b.txRate > 0
+          ? `<span style="font-weight:700;color:${txColor}">${b.txRate}%</span>`
+          : `<span style="color:var(--muted)">—</span>`;
+
+        return `<tr onclick="openDrawer('${b.id}')">
+          <td>
+            <div class="branch-cell">
+              <div class="branch-avatar">${b.initials}</div>
+              <a href="javascript:void(0)" class="branch-link-name" onclick="event.stopPropagation();openDrawer('${b.id}')" title="Click to inspect ${b.name}">
+                ${b.name}
+                <span class="branch-link-arrow">&#8250;</span>
+              </a>
+            </div>
+          </td>
+          <td style="color:var(--ink);font-weight:600;font-size:12px;">${b.pmr}</td>
+          <td style="font-weight:700">${b.orders > 0 ? b.orders : '<span style="color:var(--muted)">—</span>'}</td>
+          <td style="font-weight:700;color:var(--ink)">${spendStr}</td>
+          <td style="font-size:12px;font-weight:600;color:var(--ink);">${b.topSupplier}</td>
+          <td>${txStr}</td>
+          <td>${statusBadge}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Update pagination controls
+    updatePaginationControls(startIndex, endIndex, total);
+  }
+
+  function updatePaginationControls(start, end, total) {
+    const pageInfo = document.getElementById('pageInfoText');
+    const totalPages = Math.ceil(total / pageSize) || 1;
+    if (total === 0) {
+      pageInfo.textContent = 'Showing 0 of 0 branches';
+    } else {
+      pageInfo.textContent = `Showing ${start + 1} to ${end} of ${total} branches`;
+    }
+
+    const container = document.getElementById('paginationButtons');
+    let btns = '';
+
+    btns += `<button class="page-btn" onclick="goToPage(1)" ${currentPage===1?'disabled':''}>&laquo;</button>`;
+    btns += `<button class="page-btn" onclick="goToPage(${currentPage-1})" ${currentPage===1?'disabled':''}>&lsaquo; Prev</button>`;
+
+    for (let p = 1; p <= totalPages; p++) {
+      btns += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goToPage(${p})">${p}</button>`;
+    }
+
+    btns += `<button class="page-btn" onclick="goToPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next &rsaquo;</button>`;
+    btns += `<button class="page-btn" onclick="goToPage(${totalPages})" ${currentPage===totalPages?'disabled':''}>&raquo;</button>`;
+
+    container.innerHTML = btns;
+  }
+
+  function goToPage(p) {
+    currentPage = p;
+    renderTable();
+  }
+
+  function changePageSize(val) {
+    pageSize = parseInt(val, 10);
+    currentPage = 1;
+    renderTable();
+  }
+
+  function filterBranchTable(q) {
+    const term = q.trim().toLowerCase();
+    currentFilteredList = branches.filter(b =>
+      b.name.toLowerCase().includes(term) ||
+      b.pmr.toLowerCase().includes(term) ||
+      b.topSupplier.toLowerCase().includes(term)
+    );
+    currentPage = 1;
+    renderTable();
+  }
+
+  function sortTable(key) {
+    if (sortField === key) {
+      sortDirection *= -1;
+    } else {
+      sortField = key;
+      sortDirection = (key === 'name' || key === 'pmr') ? 1 : -1;
+    }
+
+    currentFilteredList.sort((a, b) => {
+      if (typeof a[key] === 'number') return (a[key] - b[key]) * sortDirection;
+      return a[key].localeCompare(b[key]) * sortDirection;
+    });
+    renderTable();
+  }
+
+  /* ====== Global Search Implementation ====== */
+  function handleGlobalSearch(q) {
+    const term = q.trim().toLowerCase();
+    const dropdown = document.getElementById('searchResultsDropdown');
+    const resultsContainer = document.getElementById('searchBranchResults');
+
+    if (term.length === 0) {
+      dropdown.hidden = false;
+      renderSearchBranches(branches.slice(0, 4));
+      return;
+    }
+
+    const matched = branches.filter(b => b.name.toLowerCase().includes(term) || b.pmr.toLowerCase().includes(term));
+    renderSearchBranches(matched);
+    dropdown.hidden = false;
+  }
+
+  function renderSearchBranches(list) {
+    const container = document.getElementById('searchBranchResults');
+    if (list.length === 0) {
+      container.innerHTML = `<div style="padding:8px 14px;font-size:11px;color:var(--muted)">No pharmacy branches found</div>`;
+      return;
+    }
+    container.innerHTML = list.map(b => `
+      <div class="search-result-item" onclick="selectBranchFromSearch('${b.id}')">
+        <div class="search-item-main">
+          <span style="color:var(--green)">&#127978;</span>
+          <span>${b.name}</span>
+        </div>
+        <span class="search-item-badge">${b.pmr} &bull; £${b.spend.toLocaleString()}</span>
+      </div>
+    `).join('');
+  }
+
+  function showSearchResults() {
+    handleGlobalSearch(document.getElementById('globalSearchInput').value);
+  }
+
+  function selectBranchFromSearch(id) {
+    document.getElementById('searchResultsDropdown').hidden = true;
+    openDrawer(id);
+  }
+
+  function selectSearchItem(label) {
+    document.getElementById('searchResultsDropdown').hidden = true;
+    showToast(label + ' selected');
+  }
+
+  // Keyboard shortcut Ctrl+K to focus search
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      const input = document.getElementById('globalSearchInput');
+      input.focus();
+      showSearchResults();
+    }
+    if (e.key === 'Escape') {
+      document.getElementById('searchResultsDropdown').hidden = true;
+      closeDrawer();
+    }
+  });
+
+  /* ====== Spend Chart Filters (Daily / Weekly / Monthly) ====== */
+  const chartDatasets = {
+    daily: {
+      title: 'Group Spend Trend — Daily (October 2026)',
+      sub: 'Comparing daily purchasing volume against prior month',
+      currLabel: 'October 2026 (Daily)',
+      prevLabel: 'September 2026 (Daily)',
+      svg: `
+        <line x1="0" y1="35" x2="700" y2="35" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="75" x2="700" y2="75" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="115" x2="700" y2="115" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="155" x2="700" y2="155" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="185" x2="700" y2="185" stroke="#d9e0e8" stroke-width="1"/>
+        <text x="4" y="32" font-size="9.5" fill="#667085">£8k</text>
+        <text x="4" y="72" font-size="9.5" fill="#667085">£6k</text>
+        <text x="4" y="112" font-size="9.5" fill="#667085">£4k</text>
+        <text x="4" y="152" font-size="9.5" fill="#667085">£2k</text>
+        <polyline points="30,135 80,125 130,130 180,118 230,122 280,112 330,126 380,115 430,118 480,108 530,112 580,102 630,108 670,104"
+          fill="none" stroke="#d9e0e8" stroke-width="2" stroke-dasharray="5,3"/>
+        <polygon points="30,185 30,115 80,105 130,95 180,85 230,100 280,90 330,80 380,72 430,85 480,75 530,68 580,78 630,62 670,72 670,185"
+          fill="rgba(4,120,87,0.08)"/>
+        <polyline points="30,115 80,105 130,95 180,85 230,100 280,90 330,80 380,72 430,85 480,75 530,68 580,78 630,62 670,72"
+          fill="none" stroke="#047857" stroke-width="2.5"/>
+        <circle cx="480" cy="75" r="3.5" fill="#047857" stroke="white" stroke-width="1.8"/>
+        <circle cx="630" cy="62" r="4.5" fill="#047857" stroke="white" stroke-width="2"/>
+        <rect x="555" y="22" width="112" height="46" rx="6" fill="white" stroke="#d9e0e8" stroke-width="1"/>
+        <text x="565" y="38" font-size="9" fill="#667085" font-weight="600">29 Oct (Today)</text>
+        <text x="565" y="52" font-size="12" fill="#047857" font-weight="800">£3,280</text>
+        <text x="565" y="62" font-size="8.5" fill="#b7791f">&#9650; +8.2% vs Sep</text>
+        <text x="30"  y="198" font-size="9" fill="#667085" text-anchor="middle">Day 1</text>
+        <text x="180" y="198" font-size="9" fill="#667085" text-anchor="middle">Day 8</text>
+        <text x="330" y="198" font-size="9" fill="#667085" text-anchor="middle">Day 15</text>
+        <text x="480" y="198" font-size="9" fill="#667085" text-anchor="middle">Day 22</text>
+        <text x="670" y="198" font-size="9" fill="#667085" text-anchor="middle">Day 29</text>
+      `
+    },
+    weekly: {
+      title: 'Group Spend Trend — Weekly (Last 8 Weeks)',
+      sub: 'Aggregated Monday–Sunday drop expenditure across group',
+      currLabel: 'Current 8-Week Run',
+      prevLabel: 'Prior 8-Week Average',
+      svg: `
+        <line x1="0" y1="35" x2="700" y2="35" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="85" x2="700" y2="85" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="135" x2="700" y2="135" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="185" x2="700" y2="185" stroke="#d9e0e8" stroke-width="1"/>
+        <text x="4" y="32" font-size="9.5" fill="#667085">£25k</text>
+        <text x="4" y="82" font-size="9.5" fill="#667085">£20k</text>
+        <text x="4" y="132" font-size="9.5" fill="#667085">£15k</text>
+        <polyline points="40,110 120,115 210,105 300,95 390,100 480,90 570,85 660,80"
+          fill="none" stroke="#d9e0e8" stroke-width="2" stroke-dasharray="5,3"/>
+        <polygon points="40,185 40,95 120,90 210,80 300,75 390,70 480,60 570,65 660,52 660,185"
+          fill="rgba(4,120,87,0.08)"/>
+        <polyline points="40,95 120,90 210,80 300,75 390,70 480,60 570,65 660,52"
+          fill="none" stroke="#047857" stroke-width="2.8"/>
+        <circle cx="660" cy="52" r="4.5" fill="#047857" stroke="white" stroke-width="2"/>
+        <rect x="560" y="18" width="120" height="44" rx="6" fill="white" stroke="#d9e0e8" stroke-width="1"/>
+        <text x="570" y="33" font-size="9" fill="#667085" font-weight="600">Current Week 43</text>
+        <text x="570" y="47" font-size="12" fill="#047857" font-weight="800">£21,840</text>
+        <text x="570" y="56" font-size="8.5" fill="#047857">&#9650; +5.8% weekly avg</text>
+        <text x="40"  y="198" font-size="9" fill="#667085" text-anchor="middle">Wk 36</text>
+        <text x="210" y="198" font-size="9" fill="#667085" text-anchor="middle">Wk 38</text>
+        <text x="390" y="198" font-size="9" fill="#667085" text-anchor="middle">Wk 40</text>
+        <text x="570" y="198" font-size="9" fill="#667085" text-anchor="middle">Wk 42</text>
+        <text x="660" y="198" font-size="9" fill="#667085" text-anchor="middle">Wk 43</text>
+      `
+    },
+    monthly: {
+      title: 'Group Spend Trend — Monthly (Jan–Oct 2026 YTD)',
+      sub: 'Cumulative monthly spend run-rate vs FY2025 actuals',
+      currLabel: 'FY2026 Monthly Actuals',
+      prevLabel: 'FY2025 Prior Year',
+      svg: `
+        <line x1="0" y1="35" x2="700" y2="35" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="85" x2="700" y2="85" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="135" x2="700" y2="135" stroke="#d9e0e8" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="185" x2="700" y2="185" stroke="#d9e0e8" stroke-width="1"/>
+        <text x="4" y="32" font-size="9.5" fill="#667085">£100k</text>
+        <text x="4" y="82" font-size="9.5" fill="#667085">£80k</text>
+        <text x="4" y="132" font-size="9.5" fill="#667085">£60k</text>
+        <polyline points="40,110 100,105 170,112 240,100 310,95 380,98 450,92 520,88 590,85 660,82"
+          fill="none" stroke="#d9e0e8" stroke-width="2" stroke-dasharray="5,3"/>
+        <polygon points="40,185 40,95 100,90 170,88 240,82 310,80 380,78 450,75 520,72 590,70 660,66 660,185"
+          fill="rgba(4,120,87,0.08)"/>
+        <polyline points="40,95 100,90 170,88 240,82 310,80 380,78 450,75 520,72 590,70 660,66"
+          fill="none" stroke="#047857" stroke-width="2.8"/>
+        <circle cx="660" cy="66" r="4.5" fill="#047857" stroke="white" stroke-width="2"/>
+        <rect x="560" y="24" width="120" height="44" rx="6" fill="white" stroke="#d9e0e8" stroke-width="1"/>
+        <text x="570" y="38" font-size="9" fill="#667085" font-weight="600">October (MTD)</text>
+        <text x="570" y="52" font-size="12" fill="#047857" font-weight="800">£84,620</text>
+        <text x="570" y="61" font-size="8.5" fill="#047857">&#9650; +8.4% YoY</text>
+        <text x="40"  y="198" font-size="9" fill="#667085" text-anchor="middle">Jan</text>
+        <text x="170" y="198" font-size="9" fill="#667085" text-anchor="middle">Mar</text>
+        <text x="310" y="198" font-size="9" fill="#667085" text-anchor="middle">May</text>
+        <text x="450" y="198" font-size="9" fill="#667085" text-anchor="middle">Jul</text>
+        <text x="590" y="198" font-size="9" fill="#667085" text-anchor="middle">Sep</text>
+        <text x="660" y="198" font-size="9" fill="#667085" text-anchor="middle">Oct</text>
+      `
+    }
+  };
+
+  function switchSpendFilter(type) {
+    document.querySelectorAll('.pill-switcher button').forEach(b => {
+      if (b.id === 'btnDaily' || b.id === 'btnWeekly' || b.id === 'btnMonthly') b.classList.remove('active');
+    });
+
+    if (type === 'daily') document.getElementById('btnDaily').classList.add('active');
+    if (type === 'weekly') document.getElementById('btnWeekly').classList.add('active');
+    if (type === 'monthly') document.getElementById('btnMonthly').classList.add('active');
+
+    const d = chartDatasets[type];
+    document.getElementById('trendChartTitle').textContent = d.title;
+    document.getElementById('trendChartSub').textContent = d.sub;
+    document.getElementById('legendCurr').textContent = d.currLabel;
+    document.getElementById('legendPrev').textContent = d.prevLabel;
+    document.getElementById('spendTrendSvg').innerHTML = d.svg;
+    showToast(`Spend trend switched to ${type.toUpperCase()}`);
+  }
+
+  /* ====== Supplier Spend Split (MTD vs YTD) ====== */
+  const supplierDatasets = {
+    mtd: [
+      { name: 'AAH Pharmaceuticals', val: '£28,400', pct: 34, width: 84, color: '#047857', note: '11 branches' },
+      { name: 'Alliance Healthcare', val: '£22,100', pct: 26, width: 65, color: '#0e7490', note: '9 branches' },
+      { name: 'Phoenix Healthcare', val: '£14,800', pct: 17, width: 44, color: '#0e7490', note: '8 branches' },
+      { name: 'BNS Distribution', val: '£10,220', pct: 12, width: 30, color: '#b7791f', note: '6 branches' },
+      { name: 'Sigma Pharmaceuticals', val: '£5,900', pct: 7, width: 18, color: '#b7791f', note: '4 branches' },
+      { name: 'Others & Specials', val: '£3,200', pct: 4, width: 10, color: '#667085', note: '3 branches' }
+    ],
+    ytd: [
+      { name: 'AAH Pharmaceuticals', val: '£295,000', pct: 35, width: 88, color: '#047857', note: 'Group Primary' },
+      { name: 'Alliance Healthcare', val: '£228,500', pct: 27, width: 68, color: '#0e7490', note: 'Secondary Tier' },
+      { name: 'Phoenix Healthcare', val: '£151,200', pct: 18, width: 45, color: '#0e7490', note: 'Preferred Tier' },
+      { name: 'BNS Distribution', val: '£92,700', pct: 11, width: 28, color: '#b7791f', note: 'Generics Hub' },
+      { name: 'Sigma Pharmaceuticals', val: '£51,000', pct: 6, width: 15, color: '#b7791f', note: 'Short-line EDI' },
+      { name: 'Others & Specials', val: '£24,000', pct: 3, width: 8, color: '#667085', note: 'Special Order' }
+    ]
+  };
+
+  function switchSupplierPeriod(period) {
+    document.getElementById('btnSupMTD').classList.toggle('active', period === 'mtd');
+    document.getElementById('btnSupYTD').classList.toggle('active', period === 'ytd');
+
+    document.getElementById('supplierCardTitle').textContent = `Supplier Spend Split (${period.toUpperCase()})`;
+    document.getElementById('supplierCardSub').textContent = period === 'mtd'
+      ? 'Share of group procurement by supplier (October 2026)'
+      : 'Full Year-to-Date spend distribution across 13 branches';
+
+    const data = supplierDatasets[period];
+    const container = document.getElementById('supplierBarsContainer');
+    container.innerHTML = data.map(s => `
+      <div class="sup-bar-row" onclick="showToast('${s.name}: ${s.val} (${s.pct}%)')">
+        <div class="sup-bar-hdr">
+          <span class="sup-bar-name">${s.name}</span>
+          <span class="sup-bar-val">${s.val} &bull; ${s.pct}%</span>
+        </div>
+        <div class="sup-bar-track">
+          <div class="sup-bar-fill" style="width:${s.width}%;background:${s.color}"></div>
+        </div>
+      </div>
+    `).join('');
+    showToast(`Supplier spend updated to ${period.toUpperCase()}`);
+  }
+
+  /* ====== Drawer Detail ====== */
+  function openDrawer(id) {
+    const b = branches.find(x => x.id === id);
+    if (!b) return;
+
+    document.getElementById('drawerBranchName').textContent = b.name;
+    document.getElementById('drawerBranchSub').textContent = `PMR System: ${b.pmr}  |  Site Status: ${b.status.toUpperCase()}`;
+
+    document.getElementById('drawerKpiRow').innerHTML = [
+      { label:'Orders Today', value: b.orders||'0', sub:'Transmitted' },
+      { label:'MTD Spend',    value: b.spend ? '£'+b.spend.toLocaleString() : '£0', sub:'Month to Date' },
+      { label:'Order Success Rate', value: b.txRate ? b.txRate+'%' : '0%', sub:'Direct to Supplier' }
+    ].map(k=>`<div class="drawer-kpi"><div class="drawer-kpi-label">${k.label}</div><div class="drawer-kpi-value">${k.value}</div><div class="drawer-kpi-sub">${k.sub}</div></div>`).join('');
+
+    document.getElementById('drawerSuppliers').innerHTML = b.suppliers.length
+      ? b.suppliers.map(s=>`<div class="d-sup-row"><div class="d-sup-name">${s.n}</div><div class="d-sup-bar-wrap"><div class="d-sup-bar" style="width:${s.p*2}%"></div></div><div class="d-sup-val">£${s.v.toLocaleString()} &bull; ${s.p}%</div></div>`).join('')
+      : '<div style="color:var(--muted);font-size:12px;padding:12px 0">No orders placed this month</div>';
+
+    document.getElementById('drawerOrderLog').innerHTML = b.orders_log.length
+      ? b.orders_log.map(o=>`<tr><td style="font-weight:700">${o.id}</td><td>${o.sup}</td><td style="color:var(--muted)">${o.items} lines</td><td style="font-weight:700">${o.val}</td><td><span class="status-pill ${o.st}">${o.st.toUpperCase()}</span></td><td style="color:var(--muted)">${o.t}</td></tr>`).join('')
+      : '<tr><td colspan="6" style="color:var(--muted);padding:14px;text-align:center">Zero orders placed today</td></tr>';
+
+    document.getElementById('drawer').hidden = false;
+    document.getElementById('drawerOverlay').hidden = false;
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawer').hidden = true;
+    document.getElementById('drawerOverlay').hidden = true;
+  }
+
+  /* ====== Topbar Actions ====== */
+  let notifOpen = false;
+  function toggleNotif() {
+    notifOpen = !notifOpen;
+    document.getElementById('notifDropdown').hidden = !notifOpen;
+    if (notifOpen) { profileOpen = false; document.getElementById('profileDropdown').hidden = true; }
+  }
+
+  function markAllRead() {
+    document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+    document.getElementById('notifBadge').hidden = true;
+    notifOpen = false;
+    document.getElementById('notifDropdown').hidden = true;
+    showToast('All notifications marked as read');
+  }
+
+  function markRead(el) {
+    el.classList.remove('unread');
+    const count = document.querySelectorAll('.notif-item.unread').length;
+    const badge = document.getElementById('notifBadge');
+    if (count === 0) badge.hidden = true; else badge.textContent = count;
+  }
+
+  let profileOpen = false;
+  function toggleProfile() {
+    profileOpen = !profileOpen;
+    document.getElementById('profileDropdown').hidden = !profileOpen;
+    if (profileOpen) { notifOpen = false; document.getElementById('notifDropdown').hidden = true; }
+  }
+
+  function handleLogout() {
+    showToast('Signing out of Head Office session...');
+    setTimeout(() => { profileOpen = false; document.getElementById('profileDropdown').hidden = true; }, 1200);
+  }
+
+  function handleRefresh() {
+    const now = new Date();
+    document.getElementById('lastUpdatedText').textContent =
+      'Last Synced On: Today, ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    showToast('Feed refreshed from PMR order pipes');
+  }
+
+  document.addEventListener('click', (e) => {
+    if (notifOpen && !e.target.closest('.notif-bell-wrap')) { notifOpen = false; document.getElementById('notifDropdown').hidden = true; }
+    if (profileOpen && !e.target.closest('.profile-wrap'))  { profileOpen = false; document.getElementById('profileDropdown').hidden = true; }
+    if (!e.target.closest('.global-search-wrap')) { document.getElementById('searchResultsDropdown').hidden = true; }
+  });
+
+  function showToast(msg) {
+    const wrap = document.getElementById('toastWrap');
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    t.onclick = () => t.remove();
+    wrap.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  /* ====== Initialize on Load ====== */
+  switchSpendFilter('daily');
+  switchSupplierPeriod('mtd');
+  renderTable();
+</script>
+</body>
+</html>
